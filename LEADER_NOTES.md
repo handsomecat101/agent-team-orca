@@ -16,7 +16,7 @@
 **0a. Dự án mới / máy mới — kiểm điều kiện trước (5 phút, chỉ lần đầu):**
 - `orca --version` chạy được và app Orca đang mở; `orca skills get orchestration` trả nội dung. Chưa có Orca ⇒ dừng, báo PO.
 - CLI của từng thợ trong mục 2 có trong PATH và **đã đăng nhập** (chạy thử `<cli> --help`; đăng nhập là việc của PO — leader không tự `/login`).
-- `git`, `gh auth status` (nếu cần push/PR), Node ≥ 22 (cho `tools/*.cjs`), PowerShell (cho `tools/*.ps1`).
+- `git`, `gh auth status` (nếu cần push/PR), Node ≥ 22 (cho `tools/*.cjs`), PowerShell (cho `tools/*.ps1` — Windows có sẵn; macOS/Linux cài PowerShell 7 và gọi `pwsh`).
 - `SOUL.md` đã điền (kiến trúc, lệnh build/test); **chưa điền ⇒ dùng `PROJECT_SETUP_CHECKLIST.md` hỏi PO 1 lượt** rồi điền.
 - Sửa danh sách lệnh trong `tools/verify-clean.ps1` cho đúng dự án; ghi bẫy riêng của máy vào mục 5 khi gặp.
 - Chưa có Orca Run ⇒ tạo theo `orca skills get orchestration`; ghi Run id vào tin `@handoff` đầu tiên.
