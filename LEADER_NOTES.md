@@ -1,0 +1,84 @@
+# LEADER_NOTES.md — Sổ tay Người Điều Phối (Orca Edition)
+
+> **Ai đọc:** chỉ agent được PO giao vai **điều phối (leader)**. Thợ (worker) KHÔNG cần đọc — thợ làm theo spec được giao.
+> **Không chép trạng thái task vào đây** — trạng thái ở `PROJECT_STATE.md`; bàn giao ở `AGENT_CHAT.md` (tin `@handoff` của điều phối luôn ở đầu). File này chỉ ghi **cách điều phối + sở thích PO + bài học**.
+>
+> **PO chỉ cần nói 1 câu:** *"Bạn là người điều phối dự án `<tên>`. Đọc `LEADER_NOTES.md` và làm theo mục 0."*
+>
+> 🔧 **Khi đưa kit vào dự án mới:** điền các chỗ `<...>`; mục 1 và mục 2 giữ/sửa theo PO; mục 5 ghi bẫy riêng của máy/dự án. Mỗi khi rút ra bài học điều phối mới ⇒ ghi vào đây (đây là "trí nhớ" của vai điều phối, KHÔNG để trong trí nhớ riêng của một agent).
+
+---
+
+## 0. Khởi động điều phối (đọc xong là làm — PO không phải giải thích)
+
+**Môi trường:** dự án điều phối nhiều agent qua **Orca** (app quản lý terminal / agent / worktree). Leader ra lệnh cho thợ bằng CLI `orca` từ shell của mình. Máy: `<OS, shell, GPU…>`.
+
+1. **Nạp hướng dẫn Orca đúng phiên bản:** `orca skills get orchestration` (+ `orca skills get orca-cli` cho lệnh terminal). Đọc lướt: task-create / dispatch / check / worker-done / worker-start.
+2. **Boot dự án:** `AGENTS.md` → `SOUL.md` → `PROJECT_STATE.md` → **tin `@handoff` mới nhất của điều phối ở đầu `AGENT_CHAT.md`** (Orca Run id, commit chưa push, đội hình + handle, việc còn lại) → Quick Index của `ISSUE_LOG.md`.
+3. **Xem đội đang có:** `orca terminal list --json` (tiêu đề ô cho biết thợ nào). **Không mở thêm nếu đã có.** Hộp thư: `orca orchestration check --run <run_id> --json` — đọc xong phải `--ack <deliveryId>` (không ack ⇒ tin bị phát lại).
+4. **Xem thợ đang làm gì:** `orca terminal read --terminal <handle> --json` → `result.terminal.tail`.
+5. **Git:** `git status` + `git log --oneline origin/<branch>..HEAD`.
+6. **Báo PO 3–5 dòng** tình hình, rồi chạy vòng dưới.
+
+**Vòng làm việc chuẩn (mỗi việc):**
+1. **Spec** (file .md trong thư mục tạm của leader): mục tiêu · **file được sửa / cấm sửa** · đọc mục nào trong docs · test bắt buộc · cách tự kiểm · "KHÔNG commit, KHÔNG heartbeat, báo `worker_done` khi xong".
+2. **Giao:**
+   - Thợ Orca nhận diện được (vd `claude`, `codex`): `orca orchestration worker-start --spec "<đọc file X>" --agent <agent> --model <id> --worktree "path:<repo>" --run <run_id>`.
+   - Thợ Orca KHÔNG nhận diện (CLI khác): `tools/dispatch.ps1 -Run <run> -Terminal <handle> -Id TSK-… -Spec <file>` (task-create → dispatch lấy preamble → ghép spec → gõ 1 dòng vào terminal thợ).
+   - Việc sau cho cùng thợ ⇒ **dispatch vào đúng terminal cũ**, không mở agent mới.
+3. **Chờ** (chạy nền, KHÔNG poll): `orca orchestration check --run <run> --wait --types "worker_done,escalation,question" --timeout-ms 3600000 --json`.
+4. **Thợ báo xong ≠ đúng:** đọc code then chốt → `git add` ĐÚNG file của việc đó → `tools/verify-clean.ps1` (kiểm trên bản sao sạch của index) → đụng giao diện thì kiểm **app thật** (mục 4) → mọi exit code = 0 mới commit.
+5. **Mốc lớn:** `@handoff` 3–7 dòng lên đầu `AGENT_CHAT.md` (có thể dùng `tools/handoff.cjs`) + commit. Push theo luật PO (mục 1).
+
+## 1. Cách PO muốn làm việc (sửa theo PO của dự án — đây là mẫu đã dùng thực tế)
+
+- Trả lời **ngôn ngữ của PO**, ngắn, không thuật ngữ thừa. Chủ động làm; chỉ hỏi khi thật sự là quyết định của PO (ngân sách, việc một chiều, push/release).
+- **Commit chủ động** sau khi kiểm chứng; **push 1 lần/đợt, chỉ khi PO đồng ý** (đồng ý đợt trước KHÔNG áp dụng cho đợt sau).
+- **Không giao PO kiểm thử thủ công** (nghe mù, chấm điểm…) — tự quyết bằng review công khai + số đo máy.
+- **Không tin "xong" của thợ** — kiểm bản sạch + đọc code + app thật. (Thực tế: tính năng pass 345 test vẫn vỡ giao diện — chỉ bắt được khi chạy app thật.)
+- **Đội hình ổn định:** không tự đóng cửa sổ thợ, không mở agent mới cho mỗi việc; phiên đã đóng thì khôi phục phiên cũ (vd `mcode --session`, `commandcode --resume`, `opencode -c`) thay vì mở mới.
+- **Mỗi tab Orca tối đa 3–4 ô agent**; thêm agent ⇒ **tab mới** (`orca terminal create --worktree "path:<repo>" --title "…" --command "…"`), đặt tên rõ. PO tự chia cỡ ô.
+- **Không heartbeat** — mỗi tin nhắn = 1 lượt leader đọc lại cả hội thoại = tốn token. Chỉ `status` / `question` / `escalation` / `worker_done`.
+- **Nghỉ lâu (qua đêm) ⇒ mở phiên leader MỚI** thay vì gọi lại phiên cũ (bộ đệm hết hạn ⇒ đọc lại cả phiên rất tốn). Vì vậy `@handoff` + file này phải luôn đủ để phiên mới làm tiếp.
+- Bảo mật: không in API key ra log/báo cáo; không tắt tiến trình theo tên (chỉ PID mình tạo); không tự đăng nhập tài khoản của thợ (nhờ PO).
+
+## 2. Đội thợ & quy tắc giao việc
+
+| Thợ (CLI) | Hợp với | Ghi chú vận hành |
+|---|---|---|
+| `<vd mcode / MiniMax M3.1 Flash>` | Code theo spec, test | Nhanh, rẻ; giờ cao điểm gói free có thể chậm |
+| `<vd commandcode>` | Tính năng vừa, UI theo plan | Chạy với `--yolo -t`, nếu không sẽ đứng xin phép từng lệnh |
+| `<vd opencode / DeepSeek Flash free>` | Module gói gọn, thuật toán, test | Tự đọc `AGENTS.md` |
+| `<vd agy / Gemini Flash>` | Nghiên cứu web, code việc gọn | Hỏi quyền mỗi lần sửa file (gửi `1` + Enter); báo cáo nghiên cứu **phải soát nguồn** |
+| `<Claude Sonnet>` | Việc khó: kiến trúc, luồng trạng thái | Tốn usage — chỉ khi xứng đáng |
+| `<Claude Opus>` | Thẩm mỹ / thiết kế UI, duyệt UI cuối | Thợ khác code theo thiết kế |
+
+- **Chia việc không chồng file:** trước khi giao, liệt kê file mỗi thợ được sửa; hai thợ KHÔNG cùng sửa một file. File dùng chung chỉ cho "thêm cuối / thêm 1 field", dặn đọc lại trước khi sửa. Việc lớn trên 1 file ⇒ làm **tuần tự**; phần lõi thuần (module mới + test) tách ra làm **song song** trước.
+- **Model Flash** (theo benchmark công khai) yếu ở việc dài hơi / dùng máy tính ⇒ giao việc gói gọn, đầu vào–đầu ra rõ; kết luận cuối do leader.
+- Review của thợ yếu cho thợ mạnh chỉ là **tham khảo** — leader tự kiểm trước khi bắt sửa.
+- Spec luôn ghi: **"KHÔNG build/chạy app"** nếu máy có rào cản (vd Smart App Control) — leader tự kiểm app thật.
+
+## 3. Orca — lệnh & bẫy đã gặp
+
+- `task-create` → `dispatch --task <id> --to <handle> --return-preamble --json` → ghi `result.preamble` + spec ra file → `orca terminal send --terminal <handle> --text "Đọc file <path> và làm đúng như trong đó" --enter` (= `tools/dispatch.ps1`).
+- Tách ô cạnh thợ cũ: `orca terminal split --terminal <handle> --command "<cli>"`; đặt tên: `orca terminal rename --terminal <h> --title "…"`; đóng 1 ô: `orca terminal close --terminal <h>` (chỉ khi PO bảo).
+- Terminal Claude còn **dispatch cũ chưa xong** từ chối dispatch mới ⇒ gửi spec thẳng và bảo thợ báo `worker_done` bằng `--task-id/--dispatch-id` cũ.
+- Lệnh chờ chạy nền có thể **mồ côi** khi tool timeout ⇒ lần sau lỗi `waiter_exists`: tìm tiến trình `orca … orchestration check --wait` và tắt đúng PID đó.
+- Tạm dừng thợ: Claude/CommandCode `Ctrl+C` **một lần**; mcode phím `Esc`. Làm tiếp: gõ "TIẾP TỤC task đang làm".
+- CLI thợ **tự cập nhật ⇒ đăng xuất** (vd lỗi `50112` / "Sign in with /login"): thử gõ "TIẾP TỤC" trước; vẫn lỗi thì nhờ PO đăng nhập.
+- **PowerShell 5.1:** dấu `"` trong tham số `--spec` làm vỡ lệnh ⇒ đưa spec vào file; `git commit -F <file>` thay here-string; `>` / `Out-File` ghi BOM ⇒ file patch/JSON ghi bằng Node hoặc `[IO.File]::WriteAllText(..., UTF8Encoding($false))`.
+- Máy yếu RAM: mỗi phiên CLI thợ gọi `git` liên tục cho thanh trạng thái ⇒ nhiều phiên rảnh = máy ì. Giữ đội vừa đủ (theo luật PO ở mục 1).
+
+## 4. Kiểm chứng & commit (leader làm — thợ KHÔNG commit)
+
+- **Bản sạch:** `tools/verify-clean.ps1` — `git checkout-index` ra thư mục tạm + junction `node_modules` + chạy lệnh kiểm của dự án; **gỡ junction trước khi xoá thư mục** (xoá đệ quy qua junction = xoá node_modules thật). Sửa danh sách lệnh trong script cho đúng dự án.
+- Script kiểm phải **chặn commit khi exit code ≠ 0**; gọi công cụ bằng đường dẫn đầy đủ nếu PowerShell con không có trong PATH (đã từng: `$LASTEXITCODE` cũ biến "lỗi" thành "pass").
+- File trộn việc của nhiều thợ ⇒ tách hunk (`git diff -U3` lọc theo từ khoá → `git apply --cached --recount`), không dùng `-U0`.
+- **Kiểm app thật** khi đụng giao diện (mẫu cho app desktop/WebView — `tools/gui-app.ps1`): chạy app + mở cổng CDP (`WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=<port>` với WebView2; Chrome/Edge dùng `--remote-debugging-port`), điều khiển bằng Node (`fetch` + `WebSocket`): bấm theo kịch bản, đo kích thước, bắt lỗi console, chụp ảnh — leader xem ảnh và kết luận. Đổi dữ liệu thật (localStorage, config) ⇒ **sao lưu trước**; chỉ tắt PID mình tạo.
+- **Danh tính commit** (không sửa git config của máy): `git -c user.name="<Leader>" -c user.email="<leader@local>" commit --author="<thợ đã viết> <x@local>" -F msg.txt`.
+- Commit theo từng việc; message ghi rõ đã kiểm gì, cái gì **chưa** kiểm được (trung thực).
+- Mỗi mốc: `@handoff` điều phối lên đầu `AGENT_CHAT.md` + commit.
+
+## 5. Bẫy môi trường máy / dự án
+
+- `<ghi các bẫy riêng: tường lửa ứng dụng, cổng dev cố định, app dev của PO đang chạy, nơi để API key, thư mục build chung…>`
