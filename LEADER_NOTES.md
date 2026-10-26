@@ -13,6 +13,14 @@
 
 **Môi trường:** dự án điều phối nhiều agent qua **Orca** (app quản lý terminal / agent / worktree). Leader ra lệnh cho thợ bằng CLI `orca` từ shell của mình. Máy: `<OS, shell, GPU…>`.
 
+**0a. Dự án mới / máy mới — kiểm điều kiện trước (5 phút, chỉ lần đầu):**
+- `orca --version` chạy được và app Orca đang mở; `orca skills get orchestration` trả nội dung. Chưa có Orca ⇒ dừng, báo PO.
+- CLI của từng thợ trong mục 2 có trong PATH và **đã đăng nhập** (chạy thử `<cli> --help`; đăng nhập là việc của PO — leader không tự `/login`).
+- `git`, `gh auth status` (nếu cần push/PR), Node ≥ 22 (cho `tools/*.cjs`), PowerShell (cho `tools/*.ps1`).
+- `SOUL.md` đã điền (kiến trúc, lệnh build/test); **chưa điền ⇒ dùng `PROJECT_SETUP_CHECKLIST.md` hỏi PO 1 lượt** rồi điền.
+- Sửa danh sách lệnh trong `tools/verify-clean.ps1` cho đúng dự án; ghi bẫy riêng của máy vào mục 5 khi gặp.
+- Chưa có Orca Run ⇒ tạo theo `orca skills get orchestration`; ghi Run id vào tin `@handoff` đầu tiên.
+
 1. **Nạp hướng dẫn Orca đúng phiên bản:** `orca skills get orchestration` (+ `orca skills get orca-cli` cho lệnh terminal). Đọc lướt: task-create / dispatch / check / worker-done / worker-start.
 2. **Boot dự án:** `AGENTS.md` → `SOUL.md` → `PROJECT_STATE.md` → **tin `@handoff` mới nhất của điều phối ở đầu `AGENT_CHAT.md`** (Orca Run id, commit chưa push, đội hình + handle, việc còn lại) → Quick Index của `ISSUE_LOG.md`.
 3. **Xem đội đang có:** `orca terminal list --json` (tiêu đề ô cho biết thợ nào). **Không mở thêm nếu đã có.** Hộp thư: `orca orchestration check --run <run_id> --json` — đọc xong phải `--ack <deliveryId>` (không ack ⇒ tin bị phát lại).
@@ -54,7 +62,7 @@
 | `<Claude Opus>` | Thẩm mỹ / thiết kế UI, duyệt UI cuối | Thợ khác code theo thiết kế |
 
 - **Chia việc không chồng file:** trước khi giao, liệt kê file mỗi thợ được sửa; hai thợ KHÔNG cùng sửa một file. File dùng chung chỉ cho "thêm cuối / thêm 1 field", dặn đọc lại trước khi sửa. Việc lớn trên 1 file ⇒ làm **tuần tự**; phần lõi thuần (module mới + test) tách ra làm **song song** trước.
-- **Model Flash** (theo benchmark công khai) yếu ở việc dài hơi / dùng máy tính ⇒ giao việc gói gọn, đầu vào–đầu ra rõ; kết luận cuối do leader.
+- **Chọn thợ theo năng lực:** xem WORKER_PROFILES.md (bảng benchmark có hạn dùng + quy tắc chia việc). Tóm tắt: model Flash yếu ở việc dài hơi / dùng máy tính ⇒ giao việc gói gọn, đầu vào–đầu ra rõ; kết luận cuối do leader.
 - Review của thợ yếu cho thợ mạnh chỉ là **tham khảo** — leader tự kiểm trước khi bắt sửa.
 - Spec luôn ghi: **"KHÔNG build/chạy app"** nếu máy có rào cản (vd Smart App Control) — leader tự kiểm app thật.
 
@@ -82,3 +90,32 @@
 ## 5. Bẫy môi trường máy / dự án
 
 - `<ghi các bẫy riêng: tường lửa ứng dụng, cổng dev cố định, app dev của PO đang chạy, nơi để API key, thư mục build chung…>`
+- Gợi ý từ lần vận hành trước (Windows): **Smart App Control / WDAC** chặn exe vừa build (`os error 4551`) ⇒ chờ vài phút rồi chạy lại, dùng chung 1 thư mục build cho mọi thợ, kiểm giao diện bằng exe cũ đã được phép + dev server (mục 4); **tắt SAC là việc một chiều — chỉ PO quyết**. Windows Defender quét mỗi lần `git.exe`/compiler khởi động ⇒ máy ì: gợi ý PO thêm loại trừ thư mục dự án + thư mục build.
+
+## 6. Lời khuyên vận hành (rút từ thực tế — đọc 1 lần, áp dụng mãi)
+
+**Giao việc**
+- **Spec càng rõ, thợ rẻ càng làm tốt.** Mỗi spec: mục tiêu 1 câu · file được/cấm sửa · mục docs phải đọc · ca test bắt buộc · lệnh tự kiểm · "không build/chạy app, không commit, không heartbeat". Thiếu danh sách file ⇒ thợ sửa lan sang file người khác.
+- **Tách "lõi thuần" ra trước.** Việc lớn trên 1 file to (vd view 9.000 dòng) phải làm tuần tự — nhưng phần logic thuần (module mới + test node) giao song song cho thợ khác ngay. Khi file to rảnh, phần còn lại chỉ là "nối".
+- **Việc vài dòng thì leader tự sửa** — giao + kiểm còn tốn hơn.
+- **Thợ đang làm dở thì để làm nốt**; chuyển việc giữa chừng tốn hơn đợi. Thợ chậm/quá tải ⇒ việc MỚI giao thợ khác.
+- **Đặt "không chạy app" vào spec** nếu máy có rào cản — thợ từng mất 2,5 giờ cố chụp ảnh bị chặn.
+
+**Kiểm chứng**
+- **"Xong" của thợ ≠ đúng.** Lỗi hay lọt nhất (test không bắt): ghi nhầm file khi người dùng đổi dự án giữa lúc chờ (debounce), cache "dính" dữ liệu lần đầu, vòng gọi lặp vô hạn khi state cập nhật, dùng tuỳ chọn công cụ đã bị bỏ ở bản mới, cờ "đang chạy" kẹt ở một nhánh `return` sớm, listener chạy cả khi màn hình đang ẩn.
+- **Test xanh ≠ giao diện đúng.** Đụng UI ⇒ chạy app thật, **đo kích thước + chụp ảnh + bắt lỗi console** (từng có: cả màn hình bị kéo dài 33.000 px vì thiếu `min-width: 0` — 345 test vẫn xanh).
+- **Kiểm trên bản sạch của index**, không trên working tree (working tree luôn lẫn việc dở của thợ khác).
+- **Báo cáo nghiên cứu của model Flash phải soát nguồn**: từng gặp link chỉ là trang chủ, số liệu gán nhầm cột, con số không có nguồn. Tự tra 2–3 số quan trọng nhất trước khi đưa PO.
+- Script kiểm **phải chặn khi exit code ≠ 0** và in số liệu thật (số test pass/fail) — đừng chỉ in "OK".
+
+**Token & chi phí**
+- **Không heartbeat; chờ bằng 1 lệnh `check --wait` chạy nền** (không poll định kỳ — PO từng thấy báo cáo 10 phút/lần toàn tin cũ, vô ích).
+- **Leader không gõ code tính năng** — chỉ spec, đọc code then chốt, kiểm, commit. Model mạnh đáng tiền nhất ở 2 đầu: spec chính xác trước và review sau.
+- **Nghỉ lâu ⇒ phiên leader mới** (bộ đệm hội thoại chỉ sống ~1 giờ; gọi lại phiên dài sau khi ngủ = đọc lại toàn bộ với giá đầy đủ). Muốn vậy, `@handoff` phải đủ để phiên mới làm tiếp — viết nó ở mỗi mốc.
+- Đọc file lớn bằng tìm kiếm / đọc đoạn, không đọc cả file.
+
+**Con người & giao tiếp**
+- PO thường không đọc code ⇒ báo cáo bằng **kết quả người dùng thấy** ("bấm Dừng thì về Sẵn sàng"), không bằng tên hàm.
+- **Trung thực về giới hạn:** cái gì chưa kiểm được (không chạy được app, chưa đo RAM, số liệu chưa có nguồn) phải nói rõ.
+- **Không tự quyết việc một chiều** (tắt tính năng bảo mật, xoá dữ liệu, push/release, công khai repo) — hỏi PO 1 câu ngắn kèm đề xuất.
+- Nhận xét của PO về cách làm việc ⇒ ghi ngay vào mục 1 của file này (không chỉ nhớ trong đầu).

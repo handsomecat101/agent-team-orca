@@ -7,7 +7,7 @@
 **Multi-Agent & Multi-IDE Workflow Framework cho AI Teams — kèm lớp Điều Phối (Leader) chạy trên **Orca****
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.2.0--orca-blue.svg)](https://github.com/handsomecat101/agent-team-orca)
+[![Version](https://img.shields.io/badge/version-1.2.1--orca-blue.svg)](https://github.com/handsomecat101/agent-team-orca)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 [![Made with Markdown](https://img.shields.io/badge/Made%20with-Markdown-1f425f.svg)](http://commonmark.org)
 [![Agents](https://img.shields.io/badge/Works%20with-Antigravity%20%7C%20Claude%20%7C%20Cursor%20%7C%20Codex%20%7C%20OpenCode-blueviolet)](https://github.com/handsomecat101/agent-team)
@@ -178,6 +178,7 @@ Hãy đọc SOUL.md, PROJECT_STATE.md, AGENT_CHAT.md và bảng Quick Index tron
 | [SCREENSHOTS.md](./SCREENSHOTS.md) | Hướng dẫn lưu ảnh chụp màn hình bằng chứng lỗi |
 | [CHANGELOG.md](./CHANGELOG.md) | Lịch sử nâng cấp bộ Kit & Quy tắc cho Agent bảo trì repo này |
 | [LEADER_NOTES.md](./LEADER_NOTES.md) | *(Orca Edition)* Sổ tay người điều phối — mục 0 khởi động, mục 1 cách PO làm việc |
+| [WORKER_PROFILES.md](./WORKER_PROFILES.md) | *(Orca Edition)* Hồ sơ năng lực thợ theo benchmark + cách đọc số + quy tắc chia việc |
 | [tools/](./tools) | *(Orca Edition)* dispatch · verify-clean · cdp-check · handoff |
 
 ---
@@ -196,6 +197,7 @@ Nếu bạn là một AI Agent được giao nhiệm vụ **cải tiến chính 
 - [x] v1.0 — Bộ kit cơ bản (Markdown Shared Memory)
 - [x] v1.1 — Multi-IDE Auto-Boot (`AGENTS.md`), Khóa Task Bước 1, Tag `@handoff`, Quy tắc Chống Trùng Lặp & Rolling Window tiết kiệm 80% token, bổ sung `CHANGELOG.md`
 - [x] v1.2.0-orca — Lớp Điều Phối cho Orca: `LEADER_NOTES.md` (khởi động 1 câu) + `tools/`
+- [x] v1.2.1-orca — Kiểm điều kiện dự án/máy mới, mục Lời khuyên vận hành, `WORKER_PROFILES.md`
 - [ ] v1.3 — CLI tool: `collab-kit init`, `collab-kit prune`
 
 ---

@@ -11,6 +11,14 @@
 
 ## 📅 Lịch Sử Cập Nhật (Mới nhất ở trên)
 
+### [v1.2.1-orca] - 2026-10-26
+- **Thực hiện bởi:** Claude Code (Opus 5.5), theo yêu cầu jimmyvu.
+- **Mục tiêu:** leader mới ở **bất kỳ dự án / máy nào** đọc là vào việc được, kèm kinh nghiệm đã trả giá.
+- **Chi tiết:**
+  1. `LEADER_NOTES.md` mục **0a** — kiểm điều kiện dự án/máy mới (Orca, CLI thợ đã đăng nhập, git/gh/Node, SOUL đã điền, sửa `verify-clean.ps1`, tạo Orca Run).
+  2. `LEADER_NOTES.md` mục **6 "Lời khuyên vận hành"** — giao việc, kiểm chứng (các loại lỗi test không bắt), token & chi phí, giao tiếp với PO; mục 5 thêm gợi ý bẫy Windows (Smart App Control, Defender).
+  3. Thêm **`WORKER_PROFILES.md`** — bảng benchmark model thợ (có ngày, nguồn, cảnh báo "số hãng tự công bố"), cách đọc số, quy tắc chia việc, quy trình cập nhật mỗi quý.
+  4. README: cấu trúc, bảng tài liệu, badge, roadmap.
 ### [v1.2.0-orca] - 2026-10-26
 - **Thực hiện bởi:** Claude Code (Opus 5.5) — rút ra từ 2 ngày làm điều phối Orca thực tế (cùng jimmyvu).
 - **Repo:** `handsomecat101/agent-team-orca` — bản phái sinh của `handsomecat101/agent-team` (v1.1.0); repo gốc giữ nguyên.
