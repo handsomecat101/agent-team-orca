@@ -55,11 +55,18 @@
 | Thợ (CLI) | Hợp với | Ghi chú vận hành |
 |---|---|---|
 | `<vd mcode / MiniMax M3.1 Flash>` | Code theo spec, test | Nhanh, rẻ; giờ cao điểm gói free có thể chậm |
-| `<vd commandcode>` | Tính năng vừa, UI theo plan | Chạy với `--yolo -t`, nếu không sẽ đứng xin phép từng lệnh |
+| `<vd commandcode>` | Tính năng vừa, UI theo plan | Chạy với `--yolo -t` (chế độ tự duyệt) |
 | `<vd opencode / DeepSeek Flash free>` | Module gói gọn, thuật toán, test | Tự đọc `AGENTS.md` |
-| `<vd agy / Gemini Flash>` | Nghiên cứu web, code việc gọn | Hỏi quyền mỗi lần sửa file (gửi `1` + Enter); báo cáo nghiên cứu **phải soát nguồn** |
+| `<vd agy / Gemini Flash>` | Nghiên cứu web, code việc gọn | Mở bằng `agy --dangerously-skip-permissions`; báo cáo nghiên cứu **phải soát nguồn** (hay đưa model/nguồn cũ — ghi rõ "chỉ lấy nguồn N tháng gần nhất, kèm ngày phát hành") |
 | `<Claude Sonnet>` | Việc khó: kiến trúc, luồng trạng thái | Tốn usage — chỉ khi xứng đáng |
 | `<Claude Opus>` | Thẩm mỹ / thiết kế UI, duyệt UI cuối | Thợ khác code theo thiết kế |
+
+> ⚠️ **LUẬT CỨNG: MỌI thợ mở ở chế độ TỰ DUYỆT (yolo / bypass permissions).** Nếu không, leader vắng (hoặc ngủ) là thợ đứng chờ "Do you want to proceed?" và PO phải tự đi bấm duyệt từng cửa sổ.
+> - Claude (Opus/Sonnet): `claude --model <id> --dangerously-skip-permissions` — thanh dưới phải hiện **"bypass permissions on"** (`--permission-mode acceptEdits` là CHƯA đủ: vẫn hỏi khi chạy lệnh).
+> - Gemini / Antigravity: `agy --dangerously-skip-permissions` · CommandCode: `--yolo -t` · OpenCode / mcode: chạy lệnh đầu xong xem có hộp xin phép không, có thì bật chế độ tự duyệt của CLI đó.
+> - Lỡ mở thiếu cờ: thoát (`/exit` hoặc Ctrl+C) → mở lại **đúng phiên cũ** kèm cờ (`claude --resume <id>` / `agy --conversation=<id>` — id do CLI in ra khi thoát) ⇒ giữ nguyên ngữ cảnh.
+> - **Giao việc xong 30–60 s: `orca terminal read` kiểm tra không còn hộp duyệt nào.**
+> - Bù lại rủi ro: spec luôn ghi rõ file được/cấm sửa, "không commit / không push"; leader kiểm diff trước khi commit.
 
 - **Chia việc không chồng file:** trước khi giao, liệt kê file mỗi thợ được sửa; hai thợ KHÔNG cùng sửa một file. File dùng chung chỉ cho "thêm cuối / thêm 1 field", dặn đọc lại trước khi sửa. Việc lớn trên 1 file ⇒ làm **tuần tự**; phần lõi thuần (module mới + test) tách ra làm **song song** trước.
 - **Chọn thợ theo năng lực:** xem WORKER_PROFILES.md (bảng benchmark có hạn dùng + quy tắc chia việc). Tóm tắt: model Flash yếu ở việc dài hơi / dùng máy tính ⇒ giao việc gói gọn, đầu vào–đầu ra rõ; kết luận cuối do leader.
@@ -69,6 +76,8 @@
 ## 3. Orca — lệnh & bẫy đã gặp
 
 - `task-create` → `dispatch --task <id> --to <handle> --return-preamble --json` → ghi `result.preamble` + spec ra file → `orca terminal send --terminal <handle> --text "Đọc file <path> và làm đúng như trong đó" --enter` (= `tools/dispatch.ps1`).
+- **Mỗi Run chỉ có 1 điều phối** (`orca orchestration run-show --id <run>` ⇒ `coordinator_handle`). Thợ lỡ chạy `run-use` (vd khi cửa sổ bị đóng/mở lại, handle đổi, báo cáo bằng handle cũ bị từ chối) sẽ **chiếm vai điều phối** ⇒ `task-create` của leader báo `consumer_fenced`. Sửa: leader chạy `orca orchestration run-use --id <run>`; spec ghi "thợ KHÔNG chạy run-use/run-create". Cửa sổ thợ đổi handle ⇒ báo thợ handle mới.
+- Muốn có **trợ lý điều phối** cho việc phụ: cho họ `run-create` Run RIÊNG + nhóm thợ riêng, khoá file qua `PROJECT_STATE.md`, không push.
 - Tách ô cạnh thợ cũ: `orca terminal split --terminal <handle> --command "<cli>"`; đặt tên: `orca terminal rename --terminal <h> --title "…"`; đóng 1 ô: `orca terminal close --terminal <h>` (chỉ khi PO bảo).
 - Terminal Claude còn **dispatch cũ chưa xong** từ chối dispatch mới ⇒ gửi spec thẳng và bảo thợ báo `worker_done` bằng `--task-id/--dispatch-id` cũ.
 - Lệnh chờ chạy nền có thể **mồ côi** khi tool timeout ⇒ lần sau lỗi `waiter_exists`: tìm tiến trình `orca … orchestration check --wait` và tắt đúng PID đó.

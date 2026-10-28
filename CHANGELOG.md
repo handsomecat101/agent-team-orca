@@ -11,6 +11,14 @@
 
 ## 📅 Lịch Sử Cập Nhật (Mới nhất ở trên)
 
+### [v1.2.2-orca] - 2026-10-28
+- **Thực hiện bởi:** Claude Code (Opus 5.5), theo yêu cầu jimmyvu.
+- **Vấn đề:** thợ mở thiếu chế độ tự duyệt ⇒ đứng chờ duyệt, PO phải tự bấm; thợ lỡ `run-use` chiếm vai điều phối.
+- **Chi tiết (`LEADER_NOTES.md`):**
+  1. Mục 2: **luật cứng mọi thợ mở chế độ tự duyệt** + lệnh cho Claude / agy / CommandCode / OpenCode / mcode, cách mở lại đúng phiên kèm cờ, bước kiểm 30–60 s sau giao việc.
+  2. Mục 3: mỗi Run chỉ 1 điều phối, cách lấy lại vai (`run-use`), cách cho **trợ lý điều phối** dùng Run riêng.
+  3. Bảng thợ: agy mở bằng `--dangerously-skip-permissions`; nghiên cứu phải ghi "chỉ lấy nguồn mới, kèm ngày phát hành".
+
 ### [v1.2.1-orca] - 2026-10-26
 - **Thực hiện bởi:** Claude Code (Opus 5.5), theo yêu cầu jimmyvu.
 - **Mục tiêu:** leader mới ở **bất kỳ dự án / máy nào** đọc là vào việc được, kèm kinh nghiệm đã trả giá.
