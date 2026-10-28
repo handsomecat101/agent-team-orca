@@ -7,7 +7,7 @@
 **Multi-Agent & Multi-IDE Workflow Framework cho AI Teams — kèm lớp Điều Phối (Leader) chạy trên **Orca****
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.2.2--orca-blue.svg)](https://github.com/handsomecat101/agent-team-orca)
+[![Version](https://img.shields.io/badge/version-1.2.3--orca-blue.svg)](https://github.com/handsomecat101/agent-team-orca)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 [![Made with Markdown](https://img.shields.io/badge/Made%20with-Markdown-1f425f.svg)](http://commonmark.org)
 [![Agents](https://img.shields.io/badge/Works%20with-Antigravity%20%7C%20Claude%20%7C%20Cursor%20%7C%20Codex%20%7C%20OpenCode-blueviolet)](https://github.com/handsomecat101/agent-team)
@@ -199,6 +199,7 @@ Nếu bạn là một AI Agent được giao nhiệm vụ **cải tiến chính 
 - [x] v1.2.0-orca — Lớp Điều Phối cho Orca: `LEADER_NOTES.md` (khởi động 1 câu) + `tools/`
 - [x] v1.2.1-orca — Kiểm điều kiện dự án/máy mới, mục Lời khuyên vận hành, `WORKER_PROFILES.md`
 - [x] v1.2.2-orca — Luật cứng: mọi thợ mở chế độ tự duyệt; mỗi Run 1 điều phối + trợ lý điều phối dùng Run riêng
+- [x] v1.2.3-orca — `WORKER_PROFILES.md`: bảng benchmark chi tiết (mẫu), bảng đánh giá thực chiến, spec mẫu giao thợ cập nhật benchmark
 - [ ] v1.3 — CLI tool: `collab-kit init`, `collab-kit prune`
 
 ---

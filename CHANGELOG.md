@@ -11,6 +11,11 @@
 
 ## 📅 Lịch Sử Cập Nhật (Mới nhất ở trên)
 
+### [v1.2.3-orca] - 2026-10-29
+- **Thực hiện bởi:** Claude Code (Opus 5.5), theo yêu cầu jimmyvu.
+- **Mục tiêu:** leader ở dự án khác có **format chuẩn** để tự giao thợ cập nhật benchmark và tự ghi đánh giá thực chiến ⇒ tự tin hơn khi chia việc.
+- **Chi tiết (`WORKER_PROFILES.md`):** thêm (1) **bảng benchmark chi tiết** dạng mẫu (tiêu chí × model, cách ghi số + phiên bản + nguồn, giá, gói miễn phí) với số ví dụ; (2) **bảng "Đánh giá thực chiến"** 1 dòng/việc kèm 4 dòng ví dụ thật; (3) **spec mẫu** giao 1 thợ cập nhật benchmark (chỉ nguồn mới, link đúng trang có số, leader kiểm 2–3 số).
+
 ### [v1.2.2-orca] - 2026-10-28
 - **Thực hiện bởi:** Claude Code (Opus 5.5), theo yêu cầu jimmyvu.
 - **Vấn đề:** thợ mở thiếu chế độ tự duyệt ⇒ đứng chờ duyệt, PO phải tự bấm; thợ lỡ `run-use` chiếm vai điều phối.
