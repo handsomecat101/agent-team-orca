@@ -15,6 +15,7 @@
 | **Ngày bắt đầu** | [YYYY-MM-DD] |
 | **Cập nhật gần nhất** | [YYYY-MM-DD] |
 | **Trạng thái** | 🟡 Active / 🔴 Blocked / ✅ Completed |
+| **Leader hiện tại** | [Agent điều phối duy nhất] — PO chỉ định ngày [YYYY-MM-DD]. Mọi agent khác là THỢ (`AGENTS.md` mục 0) |
 
 ## URLs & Endpoints (nếu có)
 

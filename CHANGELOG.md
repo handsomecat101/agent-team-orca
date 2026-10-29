@@ -11,6 +11,16 @@
 
 ## 📅 Lịch Sử Cập Nhật (Mới nhất ở trên)
 
+### [v1.2.4-orca] - 2026-10-29
+- **Thực hiện bởi:** Claude Code (Opus 5.5), theo yêu cầu jimmyvu.
+- **Vấn đề (gặp thật):** leader bị `consumer_fenced` nhiều lần trong 1 buổi. Đọc lịch sử terminal: 1 thợ model Flash tự chạy `run-use` + `check --ack` ⇒ chiếm Run và đọc mất thư của leader. Nguyên nhân gốc: (1) leader giao việc phụ bằng `orca terminal send` trần ⇒ thợ không có task id / không được dặn vai trò ⇒ `worker_done` bị từ chối ⇒ thợ tự "sửa" bằng lệnh điều phối; (2) gốc repo dự án không có file nào ghi ai là leader, CLI thợ không tự đọc `agent-team/`; (3) `terminal send` thiếu `--enter` ⇒ thợ không chạy mà leader tưởng đã giao.
+- **Chi tiết:**
+  1. `AGENTS.md` — thêm **mục 0 "Bạn là ai?"**: chỉ 1 leader (ghi ở `PROJECT_STATE.md`), còn lại là THỢ; thợ chỉ được `orchestration send`, cấm `run-use / run-create / check / --ack / task-create / dispatch`; bỏ qua dòng "You have N orchestration messages"; `worker_done` bị từ chối ⇒ báo `status` rồi dừng.
+  2. `PROJECT_STATE.md` — thêm dòng **Leader hiện tại** trong Project Info.
+  3. `templates/ROOT_AGENTS.md` (mới) — mẫu file vai trò để chép ra **gốc repo dự án** (+ `GEMINI.md` / `CLAUDE.md` trỏ về).
+  4. `tools/dispatch.ps1` — tự chèn **khối VAI TRÒ THỢ** lên đầu file task; ghi chú "luôn giao qua script này".
+  5. `LEADER_NOTES.md` — mục 0a: ghi leader + chép file vai trò ra gốc repo; mục 3: chỉ giao qua `dispatch.ps1` / `worker-start`, cách truy thủ phạm khi bị fence, `terminal send` phải có `--enter` + kiểm thợ đã chạy, đóng ô thợ tạm do leader mở.
+
 ### [v1.2.3-orca] - 2026-10-29
 - **Thực hiện bởi:** Claude Code (Opus 5.5), theo yêu cầu jimmyvu.
 - **Mục tiêu:** leader ở dự án khác có **format chuẩn** để tự giao thợ cập nhật benchmark và tự ghi đánh giá thực chiến ⇒ tự tin hơn khi chia việc.

@@ -20,6 +20,7 @@
 - `SOUL.md` đã điền (kiến trúc, lệnh build/test); **chưa điền ⇒ dùng `PROJECT_SETUP_CHECKLIST.md` hỏi PO 1 lượt** rồi điền.
 - Sửa danh sách lệnh trong `tools/verify-clean.ps1` cho đúng dự án; ghi bẫy riêng của máy vào mục 5 khi gặp.
 - Chưa có Orca Run ⇒ tạo theo `orca skills get orchestration`; ghi Run id vào tin `@handoff` đầu tiên.
+- Ghi dòng **Leader hiện tại** trong `PROJECT_STATE.md`; chép `templates/ROOT_AGENTS.md` ra **gốc repo dự án** thành `AGENTS.md` (+ `GEMINI.md` / `CLAUDE.md` 1 dòng trỏ về) và điền tên leader — CLI thợ chỉ tự đọc file ở gốc repo, không tự đọc `agent-team/`.
 
 1. **Nạp hướng dẫn Orca đúng phiên bản:** `orca skills get orchestration` (+ `orca skills get orca-cli` cho lệnh terminal). Đọc lướt: task-create / dispatch / check / worker-done / worker-start.
 2. **Boot dự án:** `AGENTS.md` → `SOUL.md` → `PROJECT_STATE.md` → **tin `@handoff` mới nhất của điều phối ở đầu `AGENT_CHAT.md`** (Orca Run id, commit chưa push, đội hình + handle, việc còn lại) → Quick Index của `ISSUE_LOG.md`.
@@ -77,6 +78,10 @@
 
 - `task-create` → `dispatch --task <id> --to <handle> --return-preamble --json` → ghi `result.preamble` + spec ra file → `orca terminal send --terminal <handle> --text "Đọc file <path> và làm đúng như trong đó" --enter` (= `tools/dispatch.ps1`).
 - **Mỗi Run chỉ có 1 điều phối** (`orca orchestration run-show --id <run>` ⇒ `coordinator_handle`). Thợ lỡ chạy `run-use` (vd khi cửa sổ bị đóng/mở lại, handle đổi, báo cáo bằng handle cũ bị từ chối) sẽ **chiếm vai điều phối** ⇒ `task-create` của leader báo `consumer_fenced`. Sửa: leader chạy `orca orchestration run-use --id <run>`; spec ghi "thợ KHÔNG chạy run-use/run-create". Cửa sổ thợ đổi handle ⇒ báo thợ handle mới.
+- **Giao việc CHỈ qua `tools/dispatch.ps1` / `worker-start`** — kể cả việc phụ (nghiên cứu, đọc tài liệu). Gõ spec thẳng bằng `orca terminal send` ⇒ thợ không có task id + không có khối vai trò ⇒ `worker_done` bị từ chối ⇒ thợ (hay gặp ở model Flash) tự chạy `run-use` + `check --ack` ⇒ leader bị fence và thợ đọc mất thư của leader.
+- Bị `consumer_fenced` mà không rõ ai: `orca terminal read --terminal <h> --limit 20000` từng ô thợ, tìm `run-use` / `check` / `--ack` ⇒ biết thủ phạm và nguyên nhân gốc, rồi `run-use --id <run>`.
+- `orca terminal send` **không có `--enter` chỉ gõ chữ vào ô nhập, thợ không chạy**. Mọi lần gửi: kèm `--enter`, 10–30 s sau `terminal read` xác nhận thợ đã bắt đầu (dấu hiệu tuỳ CLI: spinner, "esc interrupt"…).
+- Ô thợ **do leader tự mở** cho việc ngắn: xong + đã kiểm ⇒ leader đóng ô đó (ô rảnh vẫn nhận thông báo điều phối, dễ "tự xử lý", và tốn RAM). Ô do PO mở thì không tự đóng.
 - Muốn có **trợ lý điều phối** cho việc phụ: cho họ `run-create` Run RIÊNG + nhóm thợ riêng, khoá file qua `PROJECT_STATE.md`, không push.
 - Tách ô cạnh thợ cũ: `orca terminal split --terminal <handle> --command "<cli>"`; đặt tên: `orca terminal rename --terminal <h> --title "…"`; đóng 1 ô: `orca terminal close --terminal <h>` (chỉ khi PO bảo).
 - Terminal Claude còn **dispatch cũ chưa xong** từ chối dispatch mới ⇒ gửi spec thẳng và bảo thợ báo `worker_done` bằng `--task-id/--dispatch-id` cũ.

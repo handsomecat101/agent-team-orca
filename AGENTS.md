@@ -4,6 +4,16 @@
 
 ---
 
+## ⛔ 0. BẠN LÀ AI? (đọc trước mọi thứ)
+
+- **Chỉ có 1 leader (điều phối)** — tên ghi ở dòng **Leader hiện tại** trong `PROJECT_STATE.md` (PO chỉ định). Mọi agent khác là **THỢ**, kể cả agent từng làm leader trước đây.
+- Không chắc mình là ai ⇒ coi mình là **THỢ** và hỏi PO / leader. **Đọc được `LEADER_NOTES.md` KHÔNG có nghĩa bạn là leader.**
+- Thợ **CHỈ được** `orca orchestration send` (báo `status` / `worker_done` / hỏi). **CẤM** `orca orchestration run-use`, `run-create`, `check`, `--ack`, `task-create`, `dispatch` — các lệnh này **cướp vai điều phối** của leader (`consumer_fenced`).
+- Terminal hiện dòng *"You have N orchestration messages. Run `orca orchestration check`…"* ⇒ thợ **bỏ qua**: đó là thư của leader.
+- `worker_done` bị từ chối (thiếu task id, handle cũ…) ⇒ gửi `orca orchestration send --type status` mô tả lỗi rồi **dừng chờ leader** — KHÔNG tự xử lý bằng lệnh điều phối.
+
+---
+
 ## 🚀 1. BƯỚC KHỞI ĐỘNG BẮT BUỘC (Mỗi Phiên Mới / Đổi IDE)
 
 Trước khi thực hiện bất kỳ yêu cầu code/sửa lỗi nào, bạn **BẮT BUỘC** đọc nhanh 4 file sau theo đúng thứ tự:
@@ -42,7 +52,7 @@ Trước khi thực hiện bất kỳ yêu cầu code/sửa lỗi nào, bạn **
 
 Dự án dùng nhiều agent do **một leader điều phối qua Orca**. Nếu PO giao bạn vai điều phối:
 - Đọc **`LEADER_NOTES.md` mục 0** ngay sau 4 file boot ở trên — trong đó có: môi trường Orca và skill cần nạp, cách tiếp quản đội đang chạy, vòng giao việc → chờ → kiểm chứng → commit, cách PO muốn làm việc, công cụ trong `tools/`.
-- Thợ (worker) **không** cần đọc `LEADER_NOTES.md` — thợ làm theo spec leader giao (spec có sẵn hướng dẫn báo `worker_done`).
+- Thợ (worker) **không** đọc `LEADER_NOTES.md` (xem mục 0) — thợ làm theo spec leader giao (spec có sẵn hướng dẫn báo `worker_done`).
 
 ---
 
